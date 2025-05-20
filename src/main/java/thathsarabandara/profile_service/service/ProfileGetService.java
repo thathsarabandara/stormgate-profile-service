@@ -42,17 +42,17 @@ public class ProfileGetService {
                 return ResponseEntity.status(HttpStatus.BAD_REQUEST)
                         .body("Tenant ID is required.");
             }
-            Pageable pageable = PageRequest.of(page, size, Sort.by("createdAt").descending());
+            final Pageable pageable = PageRequest.of(page, size, Sort.by("createdAt").descending());
 
-            Specification<Profile> spec = (root, query, cb) -> cb.and(
+            final Specification<Profile> spec = (root, query, cb) -> cb.and(
                     cb.equal(root.get("tenantid"), tenantId),
                     cb.equal(root.get("isDeleted"), false)
             );
 
-            Page<Profile> profiles = profileRepository.findAll(spec, pageable);
+            final Page<Profile> profiles = profileRepository.findAll(spec, pageable);
 
-            Page<ProfileResponseDTO> dtoPage = profiles.map(profile -> {
-            ProfileDetail detail = profileDetailRepository.findByProfile(profile).orElse(null);
+            final Page<ProfileResponseDTO> dtoPage = profiles.map(profile -> {
+            final ProfileDetail detail = profileDetailRepository.findByProfile(profile).orElse(null);
 
             ProfileResponseDTO.Details detailsDto = null;
             if (detail != null) {
@@ -66,8 +66,8 @@ public class ProfileGetService {
                 );
             }
 
-            List<ProfileCustomField> customFieldList = profileCustomFeildRepository.findByProfile(profile);
-            Map<String, Object> customFields = customFieldList.stream()
+            final List<ProfileCustomField> customFieldList = profileCustomFeildRepository.findByProfile(profile);
+            final Map<String, Object> customFields = customFieldList.stream()
                 .collect(Collectors.toMap(
                     ProfileCustomField::getFieldName,
                     ProfileCustomField::getFieldValue
@@ -105,7 +105,7 @@ public class ProfileGetService {
                         .body("Either profileId or userId must be provided.");
             }
 
-            Profile profile;
+            final Profile profile;
 
             if (profileId != null) {
                 profile = profileRepository.findById(profileId)
@@ -120,7 +120,7 @@ public class ProfileGetService {
                         .body("Unauthorized access to this profile.");
             }
 
-            ProfileDetail detail = profileDetailRepository.findByProfile(profile).orElse(null);
+            final ProfileDetail detail = profileDetailRepository.findByProfile(profile).orElse(null);
 
             ProfileResponseDTO.Details detailsDto = null;
             if (detail != null) {
@@ -134,15 +134,15 @@ public class ProfileGetService {
                 );
             }
 
-            List<ProfileCustomField> customFieldList = profileCustomFeildRepository.findByProfile(profile);
-            Map<String, Object> customFields = customFieldList.stream()
+            final List<ProfileCustomField> customFieldList = profileCustomFeildRepository.findByProfile(profile);
+            final Map<String, Object> customFields = customFieldList.stream()
                     .collect(Collectors.toMap(
                             ProfileCustomField::getFieldName,
                             ProfileCustomField::getFieldValue
                     ));
 
             // Map to response DTO
-            ProfileResponseDTO responseDto = new ProfileResponseDTO(
+            final ProfileResponseDTO responseDto = new ProfileResponseDTO(
                     profile.getId(),
                     profile.getUserid(),
                     profile.getRole(),

@@ -53,7 +53,7 @@ public class ProfileService {
 
             profile = profileRepository.save(profile);
 
-            ProfileDetail detail = ProfileDetail.builder()
+            final ProfileDetail detail = ProfileDetail.builder()
                     .profile(profile)
                     .firstName(request.getFirstName())
                     .lastName(request.getLastName())
@@ -65,7 +65,7 @@ public class ProfileService {
 
             profileDetailRepository.save(detail);
 
-            ProfileResponse response = new ProfileResponse(
+            final ProfileResponse response = new ProfileResponse(
                     profile.getId(),
                     profile.getUserid(),
                     "Profile created successfully."
@@ -95,24 +95,24 @@ public class ProfileService {
                         .body(new ProfileResponse(null, null, "Photo file is required."));
             }
 
-            Profile profile = profileRepository.findById(profileid)
+            final Profile profile = profileRepository.findById(profileid)
                     .orElseThrow(() -> new IllegalArgumentException("Profile not found for ID: " + profileid));
 
-            String uploadDir = "uploads/avatars/";
-            String fileName = "avatar_" + profileid + "_" + request.getAvater().getOriginalFilename();
-            Path uploadPath = Paths.get(uploadDir);
+            final String uploadDir = "uploads/avatars/";
+            final String fileName = "avatar_" + profileid + "_" + request.getAvater().getOriginalFilename();
+            final Path uploadPath = Paths.get(uploadDir);
 
             if (!Files.exists(uploadPath)) {
                 Files.createDirectories(uploadPath);
             }
 
-            Path filePath = uploadPath.resolve(fileName);
+            final Path filePath = uploadPath.resolve(fileName);
             Files.copy(request.getAvater().getInputStream(), filePath, StandardCopyOption.REPLACE_EXISTING);
 
             profile.setAvatarUrl(filePath.toString());
             profileRepository.save(profile);
 
-            ProfileResponse response = new ProfileResponse(
+            final ProfileResponse response = new ProfileResponse(
                     profile.getId(),
                     profile.getUserid(),
                     "Profile photo uploaded successfully."
@@ -139,13 +139,13 @@ public class ProfileService {
                         .body(new ProfileResponse(null, null, "Tenant ID is required."));
             }
             
-            Profile profile = profileRepository.findById(profileId)
+            final Profile profile = profileRepository.findById(profileId)
                     .orElseThrow(() -> new IllegalArgumentException("Profile not found for ID: " + profileId));
 
             profile.setIsDeleted(true);  
             profileRepository.save(profile);
 
-            ProfileResponse response = new ProfileResponse(
+            final ProfileResponse response = new ProfileResponse(
                     profile.getId(),
                     profile.getUserid(),
                     "Profile deactivated successfully."

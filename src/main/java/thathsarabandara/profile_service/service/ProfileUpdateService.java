@@ -33,16 +33,17 @@ public class ProfileUpdateService {
     ProfileCustomFeildRepository profileCustomFeildRepository;
 
     @Transactional
-    public ResponseEntity<ProfileResponse> updateProfileDetail(String tenantid, Long profileId, ProfileDetailUpdateRequest request) {
+    public ResponseEntity<ProfileResponse> updateProfileDetail(String tenantid, 
+                        Long profileId, ProfileDetailUpdateRequest request) {
         try {
             if (tenantid == null || tenantid.isEmpty()) {
                 return ResponseEntity.status(HttpStatus.BAD_REQUEST)
                         .body(new ProfileResponse(null, null, "Tenant ID is required."));
             }
-            Profile profile = profileRepository.findById(profileId)
+            final Profile profile = profileRepository.findById(profileId)
                     .orElseThrow(() -> new IllegalArgumentException("Profile not found for ID: " + profileId));
 
-            ProfileDetail profileDetail = profileDetailRepository.findByProfile(profile)
+            final ProfileDetail profileDetail = profileDetailRepository.findByProfile(profile)
                     .orElseThrow(() -> new IllegalArgumentException("Profile details not found for this profile."));
 
             if (request.getFirstName() != null) profileDetail.setFirstName(request.getFirstName());
@@ -54,7 +55,7 @@ public class ProfileUpdateService {
 
             profileDetailRepository.save(profileDetail);
 
-            ProfileResponse response = new ProfileResponse(
+            final ProfileResponse response = new ProfileResponse(
                     profile.getId(),
                     profile.getUserid(),
                     "Profile details updated successfully."
@@ -71,26 +72,28 @@ public class ProfileUpdateService {
         }
     }
     @Transactional
-    public ResponseEntity<ProfileResponse> addOrUpdateCustomFields(String tenantid, Long profileId, ProfileCustomFieldListRequest request) {
+    public ResponseEntity<ProfileResponse> addOrUpdateCustomFields(String tenantid, 
+                        Long profileId, ProfileCustomFieldListRequest request) {
         try {
             if (tenantid == null || tenantid.isEmpty()) {
                 return ResponseEntity.status(HttpStatus.BAD_REQUEST)
                         .body(new ProfileResponse(null, null, "Tenant ID is required."));
             }
-            Profile profile = profileRepository.findById(profileId)
+            final Profile profile = profileRepository.findById(profileId)
                     .orElseThrow(() -> new IllegalArgumentException("Profile not found for ID: " + profileId));
 
             for (ProfileCustomFieldRequest fieldRequest : request.getFields()) {
-                Optional<ProfileCustomField> existingFieldOpt = profileCustomFeildRepository.findByProfileAndFieldName(profile, fieldRequest.getFieldName());
+                final Optional<ProfileCustomField> existingFieldOpt = profileCustomFeildRepository
+                    .findByProfileAndFieldName(profile, fieldRequest.getFieldName());
 
                 if (existingFieldOpt.isPresent()) {
 
-                    ProfileCustomField existingField = existingFieldOpt.get();
+                    final ProfileCustomField existingField = existingFieldOpt.get();
                     existingField.setFieldValue(fieldRequest.getFieldValue());
                     profileCustomFeildRepository.save(existingField);
                 } else {
 
-                    ProfileCustomField newField = ProfileCustomField.builder()
+                    final ProfileCustomField newField = ProfileCustomField.builder()
                             .profile(profile)
                             .fieldName(fieldRequest.getFieldName())
                             .fieldValue(fieldRequest.getFieldValue())
@@ -99,14 +102,16 @@ public class ProfileUpdateService {
                 }
             }
 
-            return ResponseEntity.ok(new ProfileResponse(profile.getId(), profile.getUserid(), "Custom fields added or updated successfully."));
+            return ResponseEntity.ok(new ProfileResponse(profile.getId(), 
+                profile.getUserid(), "Custom fields added or updated successfully."));
 
         } catch (IllegalArgumentException e) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND)
                     .body(new ProfileResponse(null, null, "Not Found: " + e.getMessage()));
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-                    .body(new ProfileResponse(null, null, "Failed to update profile custom details: " + e.getMessage()));
+                    .body(new ProfileResponse(null, null
+                    , "Failed to update profile custom details: " + e.getMessage()));
         }
     }
     @Transactional
@@ -116,12 +121,12 @@ public class ProfileUpdateService {
                 return ResponseEntity.status(HttpStatus.BAD_REQUEST)
                         .body("Tenant ID is required.");
             }
-            Profile profile = profileRepository.findById(profileId)
+            final Profile profile = profileRepository.findById(profileId)
                     .orElseThrow(() -> new IllegalArgumentException("Profile not found for ID: " + profileId));
 
-            List<ProfileCustomField> customFields = profileCustomFeildRepository.findByProfile(profile);
+            final List<ProfileCustomField> customFields = profileCustomFeildRepository.findByProfile(profile);
 
-            List<ProfileCustomFieldResponse> responseList = customFields.stream()
+            final List<ProfileCustomFieldResponse> responseList = customFields.stream()
                     .map(field -> ProfileCustomFieldResponse.builder()
                             .id(field.getId())
                             .fieldName(field.getFieldName())
