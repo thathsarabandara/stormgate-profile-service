@@ -82,4 +82,19 @@ public class ProfileController {
     ){
         return profileGetService.getAllProfiles(Tenantid, page, size);
     }
+
+    @GetMapping("/profile/{profileId}")
+    public ResponseEntity<?> getByProfileId (
+        @RequestHeader(value = "Tenant-ID", required = true) String Tenantid,
+        @PathVariable Long profileId
+    ){
+        return profileGetService.getProfileByid(Tenantid, profileId, null);
+    }
+    @GetMapping("/user/{userId}")
+    public ResponseEntity<?> getByUserid (
+        @RequestHeader(value = "Tenant-ID", required = true) String Tenantid,
+        @PathVariable String userId
+    ){
+        return profileGetService.getProfileByid(Tenantid, null, userId);
+    }
 }

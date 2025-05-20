@@ -91,4 +91,75 @@ public class ProfileGetService {
                     .body("Failed to get all profiles: " + e.getMessage());
         }
     }
+
+    @Transactional
+    public ResponseEntity<?> getProfileByid(String tenantId, Long profileId, String userId) {
+        try {
+            if (tenantId == null || tenantId.isEmpty()) {
+                return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                        .body("Tenant ID is required.");
+            }
+
+            if (profileId == null && (userId == null || userId.isEmpty())) {
+                return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                        .body("Either profileId or userId must be provided.");
+            }
+
+            Profile profile;
+
+            if (profileId != null) {
+                profile = profileRepository.findById(profileId)
+                        .orElseThrow(() -> new RuntimeException("Profile not found with id: " + profileId));
+            } else {
+                profile = profileRepository.findByUserid(userId)
+                        .orElseThrow(() -> new RuntimeException("Profile not found with userId: " + userId));
+            }
+
+            if (!Long.valueOf(tenantId).equals(profile.getTenantid())) {
+                return ResponseEntity.status(HttpStatus.FORBIDDEN)
+                        .body("Unauthorized access to this profile.");
+            }
+
+            ProfileDetail detail = profileDetailRepository.findByProfile(profile).orElse(null);
+
+            ProfileResponseDTO.Details detailsDto = null;
+            if (detail != null) {
+                detailsDto = new ProfileResponseDTO.Details(
+                        detail.getFirstName(),
+                        detail.getLastName(),
+                        detail.getGender() != null ? detail.getGender().name().toLowerCase() : null,
+                        detail.getDob(),
+                        detail.getCountry(),
+                        detail.getPhone()
+                );
+            }
+
+            List<ProfileCustomField> customFieldList = profileCustomFeildRepository.findByProfile(profile);
+            Map<String, Object> customFields = customFieldList.stream()
+                    .collect(Collectors.toMap(
+                            ProfileCustomField::getFieldName,
+                            ProfileCustomField::getFieldValue
+                    ));
+
+            // Map to response DTO
+            ProfileResponseDTO responseDto = new ProfileResponseDTO(
+                    profile.getId(),
+                    profile.getUserid(),
+                    profile.getRole(),
+                    profile.getAvatarUrl(),
+                    profile.getStatus().name().toLowerCase(),
+                    detailsDto,
+                    customFields
+            );
+
+            return ResponseEntity.ok(responseDto);
+
+        } catch (RuntimeException e) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND)
+                    .body(e.getMessage());
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body("Failed to get profile detail: " + e.getMessage());
+        }
+    }
 }
