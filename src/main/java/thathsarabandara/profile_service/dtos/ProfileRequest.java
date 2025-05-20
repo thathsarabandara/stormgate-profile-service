@@ -3,10 +3,12 @@ package thathsarabandara.profile_service.dtos;
 import java.time.LocalDate;
 
 import lombok.AllArgsConstructor;
+import lombok.Data;
 import lombok.NoArgsConstructor;
 
 @NoArgsConstructor
 @AllArgsConstructor
+@Data
 public class ProfileRequest {
     private String userid;
     private String role;
@@ -15,4 +17,5 @@ public class ProfileRequest {
     private String gender;
     private LocalDate dob;
     private String phone;
+    private String country;
 }

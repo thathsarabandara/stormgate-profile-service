@@ -8,7 +8,7 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @Data
 public class ProfileResponse {
-    private String message;
     private Long profileId;
     private String userId;
+    private String message;
 }
