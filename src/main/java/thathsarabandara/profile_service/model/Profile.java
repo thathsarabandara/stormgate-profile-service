@@ -30,10 +30,10 @@ public class Profile {
     private Long id;
 
     @Column(nullable = false)
-    private Long tenantID;
+    private Long tenantid;
 
     @Column(unique = true, nullable = false, length = 255)
-    private String userID;
+    private String userid;
 
     @Column(nullable = false, length = 50)
     private String role;
