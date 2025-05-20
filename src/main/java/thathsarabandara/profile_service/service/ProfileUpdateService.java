@@ -111,34 +111,33 @@ public class ProfileUpdateService {
     }
     @Transactional
     public ResponseEntity<?> getCustomFieldsByProfileId(String tenantid, Long profileId) {
-    try {
-        if (tenantid == null || tenantid.isEmpty()) {
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST)
-                    .body("Tenant ID is required.");
+        try {
+            if (tenantid == null || tenantid.isEmpty()) {
+                return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                        .body("Tenant ID is required.");
+            }
+            Profile profile = profileRepository.findById(profileId)
+                    .orElseThrow(() -> new IllegalArgumentException("Profile not found for ID: " + profileId));
+
+            List<ProfileCustomField> customFields = profileCustomFeildRepository.findByProfile(profile);
+
+            List<ProfileCustomFieldResponse> responseList = customFields.stream()
+                    .map(field -> ProfileCustomFieldResponse.builder()
+                            .id(field.getId())
+                            .fieldName(field.getFieldName())
+                            .fieldValue(field.getFieldValue())
+                            .build())
+                    .toList();
+
+            return ResponseEntity.ok(responseList);
+
+        } catch (IllegalArgumentException e) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND)
+                    .body("Not found: " + e.getMessage());
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body("Failed to fetch custom fields: " + e.getMessage());
         }
-        Profile profile = profileRepository.findById(profileId)
-                .orElseThrow(() -> new IllegalArgumentException("Profile not found for ID: " + profileId));
-
-        List<ProfileCustomField> customFields = profileCustomFeildRepository.findByProfile(profile);
-
-        List<ProfileCustomFieldResponse> responseList = customFields.stream()
-                .map(field -> ProfileCustomFieldResponse.builder()
-                        .id(field.getId())
-                        .fieldName(field.getFieldName())
-                        .fieldValue(field.getFieldValue())
-                        .createdAt(field.getCreatedAt())
-                        .updatedAt(field.getUpdatedAt())
-                        .build())
-                .toList();
-
-        return ResponseEntity.ok(responseList);
-
-    } catch (IllegalArgumentException e) {
-        return ResponseEntity.status(HttpStatus.NOT_FOUND)
-                .body("Not found: " + e.getMessage());
-    } catch (Exception e) {
-        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-                .body("Failed to fetch custom fields: " + e.getMessage());
     }
-}
+    
 }
