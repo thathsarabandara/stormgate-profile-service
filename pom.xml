@@ -107,7 +107,7 @@
 				<artifactId>maven-checkstyle-plugin</artifactId>
 				<version>3.3.0</version>
 				<configuration>
-					<configLocation>src/main/java/com/thathsara/authservice/auth_service/config/checkstyle/checkstyle.xml</configLocation>
+					<configLocation>src/main/java/thathsarabandara/profile_service/config/checkstyle/checkstyle.xml</configLocation>
 					<encoding>UTF-8</encoding>
 					<consoleOutput>true</consoleOutput>
 					<failsOnError>true</failsOnError>
@@ -128,7 +128,7 @@
 				<version>3.21.2</version>
 				<configuration>
 					<rulesets>
-					<ruleset>src/main/java/com/thathsara/authservice/auth_service/config/pmd/ruleset.xml</ruleset>
+					<ruleset>src/main/java/thathsarabandara/profile_service/config/pmd/ruleset.xml</ruleset>
 					</rulesets>
 					<linkXref>false</linkXref>
 					<encoding>UTF-8</encoding>
@@ -159,7 +159,7 @@
 					<effort>Max</effort>
 					<threshold>Low</threshold>
 					<failOnError>true</failOnError>
-					<includeFilterFile>src/main/java/com/thathsara/authservice/auth_service/config/spotbugs/spotbugs-security-include.xml</includeFilterFile>
+					<includeFilterFile>src/main/java/thathsarabandara/profile_service/config/spotbugs/spotbugs-security-include.xml</includeFilterFile>
 					<xmlOutput>true</xmlOutput>
 					<outputDirectory>${project.build.directory}/spotbugs</outputDirectory>
 				</configuration>
