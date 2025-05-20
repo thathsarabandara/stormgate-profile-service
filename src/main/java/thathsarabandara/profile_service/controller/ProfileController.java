@@ -2,6 +2,7 @@ package thathsarabandara.profile_service.controller;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -31,5 +32,12 @@ public class ProfileController {
         @ModelAttribute ProfilePhotoRequest request
     ) {
         return profileService.uploadPhoto(Tenantid, profileid, request);
+    }
+    @DeleteMapping("/{profileid}")
+    public ResponseEntity<ProfileResponse> deleteProfile(
+        @RequestHeader(value = "Tenant-ID", required = true) String Tenantid,
+        @PathVariable Long profileid
+    ) {
+        return profileService.deleteProfile(Tenantid, profileid);
     }
 }

@@ -131,4 +131,35 @@ public class ProfileService {
                     .body(new ProfileResponse(null, null, "Failed to upload photo: " + e.getMessage()));
         }
     }
+    @Transactional
+    public ResponseEntity<ProfileResponse> deleteProfile(String tenantid, Long profileId) {
+        try {
+            if (tenantid == null || tenantid.isEmpty()) {
+                return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                        .body(new ProfileResponse(null, null, "Tenant ID is required."));
+            }
+            
+            Profile profile = profileRepository.findById(profileId)
+                    .orElseThrow(() -> new IllegalArgumentException("Profile not found for ID: " + profileId));
+
+            profile.setIsDeleted(true);  
+            profileRepository.save(profile);
+
+            ProfileResponse response = new ProfileResponse(
+                    profile.getId(),
+                    profile.getUserid(),
+                    "Profile deactivated successfully."
+            );
+
+            return ResponseEntity.ok(response);
+
+        } catch (IllegalArgumentException e) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND)
+                    .body(new ProfileResponse(null, null, "Profile not found: " + e.getMessage()));
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body(new ProfileResponse(null, null, "Failed to deactivate profile: " + e.getMessage()));
+        }
+    }
+
 }
