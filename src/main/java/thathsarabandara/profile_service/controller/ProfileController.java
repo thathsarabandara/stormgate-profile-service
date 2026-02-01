@@ -40,21 +40,21 @@ public class ProfileController {
         return profileService.create(Tenantid, request);
     }
 
-    @PostMapping("/{profileid}/avatar")
+    @PostMapping("/{profileId}/avatar")
     public ResponseEntity<ProfileResponse> uploadAvatar(
         @RequestHeader(value = "Tenant-ID", required = true) String Tenantid,
-        @PathVariable Long profileid,
+        @PathVariable Long profileId,
         @ModelAttribute ProfilePhotoRequest request
     ) {
-        return profileService.uploadPhoto(Tenantid, profileid, request);
+        return profileService.uploadPhoto(Tenantid, profileId, request);
     }
 
-    @DeleteMapping("/{profileid}")
+    @DeleteMapping("/{profileId}")
     public ResponseEntity<ProfileResponse> deleteProfile(
         @RequestHeader(value = "Tenant-ID", required = true) String Tenantid,
-        @PathVariable Long profileid
+        @PathVariable Long profileId
     ) {
-        return profileService.deleteProfile(Tenantid, profileid);
+        return profileService.deleteProfile(Tenantid, profileId);
     }
 
     @PostMapping("/{profileId}/custom-fields")

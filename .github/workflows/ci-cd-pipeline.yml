@@ -1,0 +1,139 @@
+name: Profile Service CI/CD Pipeline
+
+on:
+  push:
+    branches: [ main, develop ]
+  pull_request:
+    branches: [ main, develop ]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+
+    strategy:
+      matrix:
+        java-version: [ 21 ]
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+      with:
+        fetch-depth: 0
+
+    - name: Set up JDK ${{ matrix.java-version }}
+      uses: actions/setup-java@v4
+      with:
+        java-version: ${{ matrix.java-version }}
+        distribution: 'temurin'
+        cache: maven
+
+    - name: Display Java version
+      run: java -version
+
+    - name: Build with Maven
+      run: ./mvnw clean package -DskipTests
+
+    - name: Run tests
+      run: ./mvnw test
+
+    - name: Run PMD analysis
+      run: ./mvnw pmd:check
+      continue-on-error: true
+
+    - name: Run Checkstyle analysis
+      run: ./mvnw checkstyle:check
+      continue-on-error: true
+
+    - name: Run SpotBugs analysis
+      run: ./mvnw spotbugs:check
+      continue-on-error: true
+
+    - name: Generate test report
+      if: always()
+      run: |
+        mkdir -p test-reports
+        cp target/surefire-reports/*.xml test-reports/ 2>/dev/null || true
+
+    - name: Publish test results
+      if: always()
+      uses: actions/upload-artifact@v4
+      with:
+        name: test-reports
+        path: test-reports/
+        retention-days: 30
+
+    - name: Publish build artifacts
+      if: success()
+      uses: actions/upload-artifact@v4
+      with:
+        name: build-artifacts-java${{ matrix.java-version }}
+        path: target/profile-service.jar
+        retention-days: 30
+
+    - name: Check build status
+      if: failure()
+      run: |
+        echo "Build failed! Please check the logs above."
+        exit 1
+
+  docker-build:
+    needs: build
+    runs-on: ubuntu-latest
+    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+
+    - name: Set up Docker Buildx
+      uses: docker/setup-buildx-action@v3
+
+    - name: Build Docker image
+      uses: docker/build-push-action@v5
+      with:
+        context: .
+        push: false
+        tags: stormgate-profile-service:latest
+        cache-from: type=gha
+        cache-to: type=gha,mode=max
+
+  code-quality:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+      with:
+        fetch-depth: 0
+
+    - name: Set up JDK 21
+      uses: actions/setup-java@v4
+      with:
+        java-version: 21
+        distribution: 'temurin'
+        cache: maven
+
+    - name: Build with Maven
+      run: ./mvnw clean package -DskipTests
+
+    - name: Quality gates check
+      run: |
+        echo "Running quality gates checks..."
+        ./mvnw clean verify -P quality-gates 2>&1 || echo "Quality gates check completed with issues"
+
+    - name: Generate reports
+      if: always()
+      run: |
+        mkdir -p reports
+        cp -r target/pmd reports/ 2>/dev/null || true
+        cp -r target/spotbugs reports/ 2>/dev/null || true
+
+    - name: Upload reports
+      if: always()
+      uses: actions/upload-artifact@v4
+      with:
+        name: quality-reports
+        path: reports/
+        retention-days: 30
