@@ -31,3 +31,12 @@ build/
 
 ### VS Code ###
 .vscode/
+### Environment Variables ###
+.env
+.env.local
+.env.*.local
+!.env.example
+
+### Docker ###
+/.docker/
+docker-compose.override.yml

@@ -44,7 +44,7 @@ public class ProfileService {
             }
 
             Profile profile = Profile.builder()
-                    .tenantid(Long.getLong(tenantId))
+                    .tenantid(Long.parseLong(tenantId))
                     .userid(request.getUserid())
                     .role(request.getRole() != null ? request.getRole() : "USER")
                     .avatarUrl(null)

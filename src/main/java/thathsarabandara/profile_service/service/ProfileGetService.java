@@ -45,7 +45,7 @@ public class ProfileGetService {
             final Pageable pageable = PageRequest.of(page, size, Sort.by("createdAt").descending());
 
             final Specification<Profile> spec = (root, query, cb) -> cb.and(
-                    cb.equal(root.get("tenantid"), tenantId),
+                    cb.equal(root.get("tenantid"), Long.parseLong(tenantId)),
                     cb.equal(root.get("isDeleted"), false)
             );
 
