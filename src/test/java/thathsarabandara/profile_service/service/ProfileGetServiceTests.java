@@ -89,6 +89,7 @@ class ProfileGetServiceTests {
         assertEquals("Tenant ID is required.", response.getBody());
     }
 
+    @SuppressWarnings("unchecked")
     @Test
     void testGetAllProfilesSuccess() {
         Page<Profile> profilePage = new PageImpl<>(List.of(profile));
@@ -107,6 +108,7 @@ class ProfileGetServiceTests {
         assertTrue(response.getBody() instanceof Page);
     }
 
+    @SuppressWarnings("unchecked")
     @Test
     void testGetAllProfilesEmptyList() {
         Page<Profile> emptyPage = new PageImpl<>(new ArrayList<>());
@@ -128,6 +130,7 @@ class ProfileGetServiceTests {
         assertEquals("Tenant ID is required.", response.getBody());
     }
 
+    @SuppressWarnings("null")
     @Test
     void testGetProfileByIdProfileNotFound() {
         when(profileRepository.findById(999L)).thenReturn(Optional.empty());
@@ -149,8 +152,10 @@ class ProfileGetServiceTests {
         ResponseEntity<?> response = profileGetService.getProfileByid("1", 1L, null);
 
         assertEquals(HttpStatus.OK, response.getStatusCode());
+        assertNotNull(response.getBody());
         assertTrue(response.getBody() instanceof ProfileResponseDTO);
         ProfileResponseDTO dto = (ProfileResponseDTO) response.getBody();
+        assertNotNull(dto);
         assertEquals("user123", dto.getUserid());
     }
 
@@ -185,6 +190,7 @@ class ProfileGetServiceTests {
         assertEquals("Either profileId or userId must be provided.", response.getBody());
     }
 
+    @SuppressWarnings("null")
     @Test
     void testGetProfileByUserIdUserNotFound() {
         when(profileRepository.findByUserid("unknownUser")).thenReturn(Optional.empty());
@@ -206,9 +212,11 @@ class ProfileGetServiceTests {
         ResponseEntity<?> response = profileGetService.getProfileByid("1", null, "user123");
 
         assertEquals(HttpStatus.OK, response.getStatusCode());
+        assertNotNull(response.getBody());
         assertTrue(response.getBody() instanceof ProfileResponseDTO);
     }
 
+    @SuppressWarnings("null")
     @Test
     void testGetProfileWithoutProfileDetail() {
         when(profileRepository.findById(1L)).thenReturn(Optional.of(profile));
@@ -225,6 +233,7 @@ class ProfileGetServiceTests {
         assertNull(dto.getDetails());
     }
 
+    @SuppressWarnings({ "unchecked", "null" })
     @Test
     void testGetAllProfilesException() {
         when(profileRepository.findAll(any(Specification.class), any(Pageable.class)))
@@ -259,8 +268,10 @@ class ProfileGetServiceTests {
         ResponseEntity<?> response = profileGetService.getProfileByid("1", 1L, null);
 
         assertEquals(HttpStatus.OK, response.getStatusCode());
+        assertNotNull(response.getBody());
         assertTrue(response.getBody() instanceof ProfileResponseDTO);
         ProfileResponseDTO dto = (ProfileResponseDTO) response.getBody();
+        assertNotNull(dto);
         assertEquals(2, dto.getCustomFields().size());
     }
 }
