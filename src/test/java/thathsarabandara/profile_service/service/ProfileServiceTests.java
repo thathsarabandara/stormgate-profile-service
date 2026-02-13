@@ -4,7 +4,6 @@ import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.Mockito.*;
 
-import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.time.LocalDate;
 import java.util.Optional;
@@ -80,6 +79,7 @@ class ProfileServiceTests {
     }
 
     @Test
+    @SuppressWarnings("null")
     void testCreateProfileSuccess() {
         when(profileRepository.save(any(Profile.class))).thenReturn(profile);
         when(profileDetailRepository.save(any(ProfileDetail.class))).thenReturn(profileDetail);
@@ -96,14 +96,17 @@ class ProfileServiceTests {
         verify(profileDetailRepository, times(1)).save(any(ProfileDetail.class));
     }
 
+    @SuppressWarnings("null")
     @Test
     void testCreateProfileMissingTenantId() {
         ResponseEntity<ProfileResponse> response = profileService.create("", profileRequest);
 
         assertEquals(HttpStatus.BAD_REQUEST, response.getStatusCode());
+        assertNotNull(response.getBody());
         assertEquals("Tenant ID is required.", response.getBody().getMessage());
     }
 
+    @SuppressWarnings("null")
     @Test
     void testCreateProfileMissingUserId() {
         profileRequest.setUserid(null);
@@ -111,14 +114,17 @@ class ProfileServiceTests {
         ResponseEntity<ProfileResponse> response = profileService.create("1", profileRequest);
 
         assertEquals(HttpStatus.BAD_REQUEST, response.getStatusCode());
+        assertNotNull(response.getBody());
         assertEquals("User ID is required.", response.getBody().getMessage());
     }
 
+    @SuppressWarnings("null")
     @Test
     void testCreateProfileInvalidTenantId() {
         ResponseEntity<ProfileResponse> response = profileService.create("invalid", profileRequest);
 
         assertEquals(HttpStatus.BAD_REQUEST, response.getStatusCode());
+        assertNotNull(response.getBody());
         assertTrue(response.getBody().getMessage().contains("Invalid input"));
     }
 
@@ -178,6 +184,7 @@ class ProfileServiceTests {
     }
 
     @Test
+    @SuppressWarnings("null")
     void testDeleteProfileNotFound() {
         when(profileRepository.findById(999L)).thenReturn(Optional.empty());
 
@@ -187,15 +194,16 @@ class ProfileServiceTests {
         assertTrue(response.getBody().getMessage().contains("Profile not found"));
     }
 
+    @SuppressWarnings("null")
     @Test
     void testDeleteProfileMissingTenantId() {
         ResponseEntity<ProfileResponse> response = profileService.deleteProfile("", 1L);
 
-        assertEquals(HttpStatus.BAD_REQUEST, response.getStatusCode());
-        assertEquals("Tenant ID is required.", response.getBody().getMessage());
+        assertEquals(HttpStatus.BAD_REQUEST, response.getStatusCode());        assertNotNull(response.getBody());        assertEquals("Tenant ID is required.", response.getBody().getMessage());
     }
 
     @Test
+    @SuppressWarnings("null")
     void testUploadPhotoSuccess() throws IOException {
         byte[] content = "photo content".getBytes();
         MockMultipartFile file = new MockMultipartFile(
@@ -217,6 +225,7 @@ class ProfileServiceTests {
         assertEquals("Profile photo uploaded successfully.", response.getBody().getMessage());
     }
 
+    @SuppressWarnings("null")
     @Test
     void testUploadPhotoMissingTenantId() throws IOException {
         byte[] content = "photo content".getBytes();
@@ -237,6 +246,7 @@ class ProfileServiceTests {
     }
 
     @Test
+    @SuppressWarnings("null")
     void testUploadPhotoMissingFile() {
         ProfilePhotoRequest request = new ProfilePhotoRequest();
         request.setAvater(null);
@@ -268,6 +278,7 @@ class ProfileServiceTests {
     }
 
     @Test
+    @SuppressWarnings("null")
     void testCreateProfileDatabaseException() {
         when(profileRepository.save(any(Profile.class)))
                 .thenThrow(new RuntimeException("Database error"));
