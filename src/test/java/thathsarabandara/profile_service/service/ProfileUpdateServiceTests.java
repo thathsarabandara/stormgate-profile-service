@@ -72,6 +72,7 @@ class ProfileUpdateServiceTests {
                 .build();
     }
 
+    @SuppressWarnings("null")
     @Test
     void testUpdateProfileDetailMissingTenantId() {
         ResponseEntity<ProfileResponse> response = profileUpdateService.updateProfileDetail("", 1L, null);
@@ -81,6 +82,7 @@ class ProfileUpdateServiceTests {
     }
 
     @Test
+    @SuppressWarnings("null")
     void testUpdateProfileDetailProfileNotFound() {
         when(profileRepository.findById(999L)).thenReturn(Optional.empty());
 
@@ -91,6 +93,7 @@ class ProfileUpdateServiceTests {
     }
 
     @Test
+    @SuppressWarnings("null")
     void testUpdateProfileDetailSuccess() {
         ProfileDetailUpdateRequest request = new ProfileDetailUpdateRequest();
         request.setFirstName("Jane");
@@ -124,6 +127,7 @@ class ProfileUpdateServiceTests {
     }
 
     @Test
+    @SuppressWarnings("null")
     void testUpdateProfileDetailProfileDetailsNotFound() {
         when(profileRepository.findById(1L)).thenReturn(Optional.of(profile));
         when(profileDetailRepository.findByProfile(profile)).thenReturn(Optional.empty());
@@ -134,6 +138,7 @@ class ProfileUpdateServiceTests {
         assertTrue(response.getBody().getMessage().contains("not found"));
     }
 
+    @SuppressWarnings("null")
     @Test
     void testAddOrUpdateCustomFieldsMissingTenantId() {
         ResponseEntity<ProfileResponse> response = profileUpdateService.addOrUpdateCustomFields("", 1L, null);
@@ -143,6 +148,7 @@ class ProfileUpdateServiceTests {
     }
 
     @Test
+    @SuppressWarnings("null")
     void testAddOrUpdateCustomFieldsProfileNotFound() {
         when(profileRepository.findById(999L)).thenReturn(Optional.empty());
 
@@ -152,8 +158,7 @@ class ProfileUpdateServiceTests {
         assertTrue(response.getBody().getMessage().toLowerCase().contains("not found"));
     }
 
-    @Test
-    void testAddNewCustomFields() {
+    @Test    @SuppressWarnings("null")    void testAddNewCustomFields() {
         ProfileCustomFieldListRequest request = new ProfileCustomFieldListRequest();
         List<ProfileCustomFieldRequest> fields = new ArrayList<>();
         fields.add(new ProfileCustomFieldRequest());
@@ -174,8 +179,7 @@ class ProfileUpdateServiceTests {
         verify(profileCustomFeildRepository, times(1)).save(any(ProfileCustomField.class));
     }
 
-    @Test
-    void testUpdateExistingCustomFields() {
+    @Test    void testUpdateExistingCustomFields() {
         ProfileCustomFieldListRequest request = new ProfileCustomFieldListRequest();
         List<ProfileCustomFieldRequest> fields = new ArrayList<>();
         fields.add(new ProfileCustomFieldRequest());
@@ -239,6 +243,7 @@ class ProfileUpdateServiceTests {
         assertEquals("Tenant ID is required.", response.getBody());
     }
 
+    @SuppressWarnings("null")
     @Test
     void testGetCustomFieldsByProfileIdProfileNotFound() {
         when(profileRepository.findById(999L)).thenReturn(Optional.empty());
@@ -250,6 +255,7 @@ class ProfileUpdateServiceTests {
     }
 
     @Test
+    @SuppressWarnings("null")
     void testGetCustomFieldsByProfileIdSuccess() {
         List<ProfileCustomField> fields = Arrays.asList(
                 ProfileCustomField.builder().id(1L).fieldName("department").fieldValue("Engineering").build(),
@@ -268,6 +274,7 @@ class ProfileUpdateServiceTests {
     }
 
     @Test
+    @SuppressWarnings("null")
     void testGetCustomFieldsByProfileIdEmpty() {
         when(profileRepository.findById(1L)).thenReturn(Optional.of(profile));
         when(profileCustomFeildRepository.findByProfile(profile)).thenReturn(new ArrayList<>());
