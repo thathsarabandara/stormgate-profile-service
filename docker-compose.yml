@@ -1,0 +1,86 @@
+version: '3.8'
+
+services:
+  stormgate-db:
+    image: mysql:8.0.36
+    container_name: stormgate-mysql
+    environment:
+      MYSQL_ROOT_PASSWORD: StormGate@2025
+      MYSQL_DATABASE: profile_service
+      MYSQL_USER: stormgate
+      MYSQL_PASSWORD: StormGate@2025
+    ports:
+      - "3306:3306"
+    volumes:
+      - mysql_data:/var/lib/mysql
+      - ./init-db.sql:/docker-entrypoint-initdb.d/init.sql
+    networks:
+      - stormgate-network
+    healthcheck:
+      test: [ "CMD", "mysqladmin", "ping", "-h", "localhost", "-u", "stormgate", "-pStormGate@2025" ]
+      timeout: 20s
+      retries: 10
+      interval: 10s
+
+  redis:
+    image: redis:7.2-alpine
+    container_name: stormgate-redis
+    ports:
+      - "6379:6379"
+    networks:
+      - stormgate-network
+    healthcheck:
+      test: [ "CMD", "redis-cli", "ping" ]
+      timeout: 3s
+      retries: 5
+      interval: 5s
+
+  profile-service:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: stormgate-profile-service
+    environment:
+      SPRING_DATASOURCE_URL: jdbc:mysql://stormgate-db:3306/profile_service?useSSL=false&serverTimezone=UTC&allowPublicKeyRetrieval=true
+      SPRING_DATASOURCE_USERNAME: stormgate
+      SPRING_DATASOURCE_PASSWORD: StormGate@2025
+      SPRING_JPA_HIBERNATE_DDL_AUTO: update
+      SPRING_DATA_REDIS_HOST: redis
+      SPRING_DATA_REDIS_PORT: 6379
+      SPRING_MAIL_HOST: mailhog
+      SPRING_MAIL_PORT: 1025
+      JWT_SECRET: acfddd580c0caa2e.2cad8b560cec782369e73960d0089949d314ba4ac0062ba803ce.9201b0da1a80781b7815dc0f99f3e745a66a795db6cda91324f7a055691a5ab689.cfd488e42439ff75a98ccc74a3813662ba45f07deaa5fb05c64a795df76be7d1030.aa5259ae5a7e97d8fbe38a7cd185e59c5ec654aabd70374c4f64e8f5908fe2cf1617bb.6dfb923b98d48f14051f9c4560a2c10a146a1d82fac2651978e0c60786442073682e0626.f7de03959df0429746ba70cce5ef8b941c75325efd64cbed76647881931334889b28c5ee5.e953d74b22a9e05f600157ee0ce541b4011f798bc02479ff19e696c5bbea62b002f12102d.16e10cd2edd4115c8a9a03b
+      JWT_EXPIRATION_MS: 72000000
+    ports:
+      - "8082:8082"
+    depends_on:
+      stormgate-db:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    networks:
+      - stormgate-network
+    volumes:
+      - ./uploads:/uploads
+    healthcheck:
+      test: [ "CMD", "curl", "-f", "http://localhost:8082/actuator/health" ]
+      timeout: 10s
+      retries: 5
+      interval: 10s
+
+  mailhog:
+    image: mailhog/mailhog:latest
+    container_name: stormgate-mailhog
+    ports:
+      - "1025:1025"
+      - "8025:8025"
+    networks:
+      - stormgate-network
+
+volumes:
+  mysql_data:
+    driver: local
+
+networks:
+  stormgate-network:
+    driver: bridge
