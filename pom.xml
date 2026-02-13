@@ -12,7 +12,7 @@
 	<artifactId>profile-service</artifactId>
 	<version>0.0.1-SNAPSHOT</version>
 	<name>profile-service</name>
-	<description>Demo project for Spring Boot</description>
+	<description>Stormgate Profile Service</description>
 	<url/>
 	<licenses>
 		<license/>
